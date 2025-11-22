@@ -1,5 +1,6 @@
 # Crypto Options Pricing & Greeks Explainer
-
+https://huggingface.co/spaces/SRC-7777/Crypto-Options-Pricing-Greeks-Explainer
+test it here^
 A "Bloomberg Terminal" lite interface for simulating crypto option prices and understanding the "Greeks" (Delta, Gamma, Theta).
 
 ![Status](https://img.shields.io/badge/Status-Active-success)
