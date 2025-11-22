@@ -1,28 +1,18 @@
 import numpy as np
 from scipy.stats import norm
 
-def heston_model_sim(S0, v0, rho, kappa, theta, sigma, T, r, strike, option_type="call", num_paths=10000, num_steps=100):
+def heston_model_sim(S0, v0, rho, kappa, theta, sigma, T, r, strike, option_type="call", num_paths=10000, num_steps=100, seed=None):
     """
     Monte Carlo simulation for Heston Model.
     
     Parameters:
-    S0: Initial asset price
-    v0: Initial variance
-    rho: Correlation between asset and variance Brownian motions
-    kappa: Rate of mean reversion for variance
-    theta: Long-run average variance
-    sigma: Volatility of variance (vol of vol)
-    T: Time to maturity (in years)
-    r: Risk-free rate
-    strike: Strike price
-    option_type: "call" or "put"
-    num_paths: Number of Monte Carlo paths
-    num_steps: Number of time steps
-    
-    Returns:
-    Option price
+    ...
+    seed: Random seed for reproducibility (variance reduction in Greeks)
     """
     dt = T / num_steps
+    
+    if seed is not None:
+        np.random.seed(seed)
     
     # Generate correlated random numbers
     # dW1 and dW2 are correlated with rho
@@ -64,7 +54,7 @@ def heston_model_sim(S0, v0, rho, kappa, theta, sigma, T, r, strike, option_type
 
 def calculate_greeks(S0, v0, rho, kappa, theta, sigma, T, r, strike, option_type="call"):
     """
-    Calculates Delta, Gamma, Theta using finite differences.
+    Calculates Delta, Gamma, Theta using finite differences with Common Random Numbers.
     """
     # Perturbations
     dS = S0 * 0.01
@@ -76,12 +66,14 @@ def calculate_greeks(S0, v0, rho, kappa, theta, sigma, T, r, strike, option_type
     # To reduce noise, we should ideally use Common Random Numbers, but for simplicity re-running with high N.
     # Let's use N=20000 for Greeks
     N = 20000
+    SEED = 42 # Fixed seed for Common Random Numbers
     
-    P = heston_model_sim(S0, v0, rho, kappa, theta, sigma, T, r, strike, option_type, num_paths=N)
+    P = heston_model_sim(S0, v0, rho, kappa, theta, sigma, T, r, strike, option_type, num_paths=N, seed=SEED)
     
     # Delta & Gamma (Central Difference)
-    P_up = heston_model_sim(S0 + dS, v0, rho, kappa, theta, sigma, T, r, strike, option_type, num_paths=N)
-    P_down = heston_model_sim(S0 - dS, v0, rho, kappa, theta, sigma, T, r, strike, option_type, num_paths=N)
+    # IMPORTANT: Use SAME seed for perturbed paths to reduce variance
+    P_up = heston_model_sim(S0 + dS, v0, rho, kappa, theta, sigma, T, r, strike, option_type, num_paths=N, seed=SEED)
+    P_down = heston_model_sim(S0 - dS, v0, rho, kappa, theta, sigma, T, r, strike, option_type, num_paths=N, seed=SEED)
     
     delta = (P_up - P_down) / (2 * dS)
     gamma = (P_up - 2*P + P_down) / (dS**2)
@@ -90,7 +82,7 @@ def calculate_greeks(S0, v0, rho, kappa, theta, sigma, T, r, strike, option_type
     # Theta is usually negative, time decay.
     # Price with less time to maturity
     if T > dT:
-        P_time_decay = heston_model_sim(S0, v0, rho, kappa, theta, sigma, T - dT, r, strike, option_type, num_paths=N)
+        P_time_decay = heston_model_sim(S0, v0, rho, kappa, theta, sigma, T - dT, r, strike, option_type, num_paths=N, seed=SEED)
         theta_val = (P_time_decay - P) / dT
     else:
         theta_val = 0 # Expiring
