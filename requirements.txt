@@ -1,0 +1,11 @@
+dash
+pandas
+numpy
+scipy
+langgraph
+langchain
+langchain-openai
+plotly
+requests
+pyarrow
+python-dotenv
