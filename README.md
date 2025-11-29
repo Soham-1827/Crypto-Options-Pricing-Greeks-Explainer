@@ -1,6 +1,6 @@
 # Crypto Options Pricing & Greeks Explainer
 https://huggingface.co/spaces/SRC-7777/Crypto-Options-Pricing-Greeks-Explainer
-test it here^
+
 A "Bloomberg Terminal" lite interface for simulating crypto option prices and understanding the "Greeks" (Delta, Gamma, Theta).
 
 ![Status](https://img.shields.io/badge/Status-Active-success)
@@ -72,6 +72,3 @@ This project is ready for deployment on Hugging Face Spaces.
 2.  Upload the files from this repository.
 3.  Go to **Settings** > **Variables** and add `OPENAI_API_KEY`.
 
-## ⚠️ Disclaimer
-
-**This tool is for educational purposes only.** The prices generated are simulations based on mathematical models and do not represent guaranteed market prices. Crypto options are high-risk instruments.
